@@ -1,10 +1,13 @@
 // File: app/api/updateOptions/route.ts
-import { NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import {NextResponse} from 'next/server';
+import {createClient} from '@/utils/supabase/server';
 import * as cheerio from 'cheerio';
 
 
-export async function GET() {
+export async function GET(request: Request) {
+    if (request.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
+        return new NextResponse('Unauthorized', {status: 401});
+    }
 
     const supabase = createClient();
 
@@ -20,12 +23,12 @@ export async function GET() {
     $('[data-select="month"] .customSelect__list button').each((i, el) => {
         const optionValue = $(el).attr('data-select-option')?.trim();
         if (optionValue) {
-            newOptions.push({ id: i, name: optionValue });
+            newOptions.push({id: i, name: optionValue});
         }
     });
 
     // Fetch stored options from Supabase
-    const { data: storedOptions, error: fetchError } = await (await supabase)
+    const {data: storedOptions, error: fetchError} = await (await supabase)
         .from('options')
         .select('*');
 
@@ -57,9 +60,9 @@ export async function GET() {
     ) {
         if (!compareOptions(storedOptions, newOptions)) {
             for (const option of newOptions) {
-                const { error: updateError } = await (await supabase)
+                const {error: updateError} = await (await supabase)
                     .from('options')
-                    .update({ name: option.name })
+                    .update({name: option.name})
                     .eq('id', option.id);
                 if (updateError) {
                     console.error('Error updating option:', updateError);
@@ -69,5 +72,5 @@ export async function GET() {
     }
 
     await updateOptionsIfNeeded(storedOptions, newOptions);
-    return NextResponse.json({ message: 'Options updated if needed.' });
+    return NextResponse.json({message: 'Options updated if needed.'});
 }
