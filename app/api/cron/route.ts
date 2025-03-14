@@ -12,8 +12,7 @@ export async function GET(request: Request) {
 
     // Fetch the webpage HTML to retrieve new options
 
-    // const url = 'https://next-ecommerce-nine-omega.vercel.app/'
-    const url = 'https://sales.ft.org.ua/events';
+    const url = 'https://next-ecommerce-nine-omega.vercel.app/'
     const response = await fetch(url);
     const html = await response.text();
 
@@ -21,8 +20,7 @@ export async function GET(request: Request) {
     const $ = cheerio.load(html);
     const newOptions: { id: number; name: string }[] = [];
 
-    // const selector = '.grid .product-brand'
-    const selector = '[data-select="month"] .customSelect__list button'
+    const selector = '.grid .product-brand'
 
     $(selector).each((index, el) => {
         const optionValue = $(el).attr('data-select-option')?.trim();
