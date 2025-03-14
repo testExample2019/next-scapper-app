@@ -52,12 +52,8 @@ export async function GET(request: Request) {
         return true;
     }
 
-    let hasChanged = false;
-
     // Update options in Supabase if there is a difference
     if (!compareOptions(storedOptions, newOptions)) {
-        hasChanged = true;
-
         // Update existing options or insert new ones
         for (const option of newOptions) {
             const existing = storedOptions.find(o => o.id === option.id);
@@ -86,10 +82,7 @@ export async function GET(request: Request) {
                 if (deleteError) console.error('Error deleting option:', deleteError);
             }
         }
-    }
 
-    // If changes occurred, send a notification to your Telegram bot
-    if (hasChanged) {
         const botToken = process.env.TELEGRAM_BOT_TOKEN;
         const chatId = process.env.TELEGRAM_CHAT_ID;
 
@@ -114,8 +107,8 @@ export async function GET(request: Request) {
         }
     }
 
+
     return NextResponse.json({
         message: 'Options updated if needed',
-        changed: hasChanged,
     });
 }
