@@ -78,9 +78,9 @@ export async function GET(request: Request) {
                 const existingOption = storedOptions.find(stored => stored.id === option.id);
                 if (existingOption) {
                     // Option exists, so update its name
-                    const { error: updateError } = await supabase
+                    const {error: updateError} = await supabase
                         .from('options')
-                        .update({ name: option.name })
+                        .update({name: option.name})
                         .eq('id', option.id);
                     if (updateError) {
                         console.error('Error updating option:', updateError);
@@ -108,6 +108,7 @@ export async function GET(request: Request) {
                     }
                 }
             }
+            return NextResponse.json({message: 'Options updated'});
         }
     }
 
