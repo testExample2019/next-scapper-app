@@ -18,6 +18,7 @@ export async function GET(request: Request) {
     // Load the HTML into Cheerio and extract new options
     const $ = cheerio.load(html);
     const newOptions: { id: number; name: string }[] = [];
+
     const selector = '[data-select="month"] .customSelect__list button'
 
     $(selector).each((index, el) => {
@@ -26,7 +27,6 @@ export async function GET(request: Request) {
             newOptions.push({id: index, name: optionValue});
         }
     });
-
     // Fetch stored options from Supabase
     const {data: storedOptions, error: fetchError} = await supabase
         .from('options')
