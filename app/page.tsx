@@ -41,19 +41,12 @@ export default async function Home() {
 
     // Helper function to compare stored options with new options based on the 'name' field
     function compareOptions(
-        storedOptions: { id: number; name: string }[],
-        newOptions: { id: number; name: string }[],
+        arr1: { id: number; name: string }[],
+        arr2: { id: number; name: string }[]
     ): boolean {
-        // Extract the names from both arrays
-        const storedNames = storedOptions.map(option => option.name);
-        const newNames = newOptions.map(option => option.name);
-
-        // If lengths differ, the arrays are different
-        if (storedNames.length !== newNames.length) return false;
-
-        // Compare each element in order
-        for (let i = 0; i < storedNames.length; i++) {
-            if (storedNames[i] !== newNames[i]) {
+        if (arr1.length !== arr2.length) return false;
+        for (let i = 0; i < arr1.length; i++) {
+            if (arr1[i].id !== arr2[i].id || arr1[i].name !== arr2[i].name) {
                 return false;
             }
         }
@@ -68,12 +61,24 @@ export default async function Home() {
         if (!compareOptions(storedOptions, newOptions)) {
             // Iterate over each new option and update the corresponding row in the table
             for (const option of newOptions) {
-                const {error: updateError} = await supabase
-                    .from('options')
-                    .update({name: option.name})
-                    .eq('id', option.id);
-                if (updateError) {
-                    console.error('Error updating option:', updateError);
+                const existingOption = storedOptions.find(stored => stored.id === option.id);
+                if (existingOption) {
+                    // Option exists, so update its name
+                    const { error: updateError } = await supabase
+                        .from('options')
+                        .update({ name: option.name })
+                        .eq('id', option.id);
+                    if (updateError) {
+                        console.error('Error updating option:', updateError);
+                    }
+                } else {
+                    // Option does not exist, so insert it
+                    const {error: insertError} = await supabase
+                        .from('options')
+                        .insert(option);
+                    if (insertError) {
+                        console.error('Error inserting option:', insertError);
+                    }
                 }
             }
             // Remove options from storedOptions that are not present in newOptions
@@ -93,6 +98,9 @@ export default async function Home() {
     }
 
 
+    console.log(storedOptions)
+    console.log(newOptions)
+    console.log(compareOptions(storedOptions, newOptions))
     await updateOptionsIfNeeded(storedOptions, newOptions);
 
 

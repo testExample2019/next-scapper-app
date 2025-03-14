@@ -75,12 +75,24 @@ export async function GET(request: Request) {
         if (!compareOptions(storedOptions, newOptions)) {
             // Iterate over each new option and update the corresponding row in the table
             for (const option of newOptions) {
-                const {error: updateError} = await supabase
-                    .from('options')
-                    .update({name: option.name})
-                    .eq('id', option.id);
-                if (updateError) {
-                    console.error('Error updating option:', updateError);
+                const existingOption = storedOptions.find(stored => stored.id === option.id);
+                if (existingOption) {
+                    // Option exists, so update its name
+                    const { error: updateError } = await supabase
+                        .from('options')
+                        .update({ name: option.name })
+                        .eq('id', option.id);
+                    if (updateError) {
+                        console.error('Error updating option:', updateError);
+                    }
+                } else {
+                    // Option does not exist, so insert it
+                    const {error: insertError} = await supabase
+                        .from('options')
+                        .insert(option);
+                    if (insertError) {
+                        console.error('Error inserting option:', insertError);
+                    }
                 }
             }
             // Remove options from storedOptions that are not present in newOptions
