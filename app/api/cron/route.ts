@@ -83,28 +83,9 @@ export async function GET(request: Request) {
             }
         }
 
-        const botToken = process.env.TELEGRAM_BOT_TOKEN;
-        const chatId = process.env.TELEGRAM_CHAT_ID;
-
-        if (!botToken || !chatId) {
-            console.error('Telegram bot token or chat ID not configured.');
-        } else {
-            const message = `Options table updated at ${new Date().toISOString()}.`;
-            const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
-            const params = new URLSearchParams({
-                chat_id: chatId,
-                text: message,
-            });
-            const telegramResponse = await fetch(telegramUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: params.toString(),
-            });
-            if (!telegramResponse.ok) {
-                const errText = await telegramResponse.text();
-                console.error('Error sending Telegram notification:', errText);
-            }
-        }
+        await supabase.functions.invoke('telegramNotification', {
+            body: { name: 'Functions' },
+        })
     }
 
 
