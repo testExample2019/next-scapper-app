@@ -1,41 +1,41 @@
 // File: app/api/notifyOptionsChange/route.ts
-import { NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import {NextResponse} from 'next/server';
+import {createClient} from '@/utils/supabase/server';
 import * as cheerio from 'cheerio';
 
 export async function GET(request: Request) {
     // Authorization check using CRON_SECRET
     if (request.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
-        return new NextResponse('Unauthorized', { status: 401 });
+        return new NextResponse('Unauthorized', {status: 401});
     }
 
     const supabase = await createClient();
 
     // Fetch the webpage HTML to retrieve new options
-    const url = 'https://next-ecommerce-nine-omega.vercel.app/';
+    const url = 'https://sales.ft.org.ua/events';
     const response = await fetch(url);
     const html = await response.text();
 
     // Load the HTML into Cheerio and extract new options
     const $ = cheerio.load(html);
     const newOptions: { id: number; name: string }[] = [];
-    const selector = '.grid .product-brand';
+    const selector = '[data-select="month"] .customSelect__list button'
 
     $(selector).each((index, el) => {
         const optionValue = $(el).text()?.trim();
         if (optionValue) {
-            newOptions.push({ id: index, name: optionValue });
+            newOptions.push({id: index, name: optionValue});
         }
     });
 
     // Fetch stored options from Supabase
-    const { data: storedOptions, error: fetchError } = await supabase
+    const {data: storedOptions, error: fetchError} = await supabase
         .from('options')
         .select('*');
 
     if (fetchError) {
         console.error('Error fetching stored options:', fetchError);
-        return new NextResponse('Error fetching stored options', { status: 500 });
+        return new NextResponse('Error fetching stored options', {status: 500});
     }
 
     // Helper function to compare stored options with new options (by 'name')
@@ -58,13 +58,13 @@ export async function GET(request: Request) {
         for (const option of newOptions) {
             const existing = storedOptions.find(o => o.id === option.id);
             if (existing) {
-                const { error: updateError } = await supabase
+                const {error: updateError} = await supabase
                     .from('options')
-                    .update({ name: option.name })
+                    .update({name: option.name})
                     .eq('id', option.id);
                 if (updateError) console.error('Error updating option:', updateError);
             } else {
-                const { error: insertError } = await supabase
+                const {error: insertError} = await supabase
                     .from('options')
                     .insert(option);
                 if (insertError) console.error('Error inserting option:', insertError);
@@ -75,7 +75,7 @@ export async function GET(request: Request) {
         const newIds = newOptions.map(o => o.id);
         for (const stored of storedOptions) {
             if (!newIds.includes(stored.id)) {
-                const { error: deleteError } = await supabase
+                const {error: deleteError} = await supabase
                     .from('options')
                     .delete()
                     .eq('id', stored.id);
@@ -84,7 +84,7 @@ export async function GET(request: Request) {
         }
 
         await supabase.functions.invoke('telegramNotification', {
-            body: { name: 'Functions' },
+            body: {name: 'Functions'},
         })
     }
 

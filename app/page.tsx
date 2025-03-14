@@ -5,8 +5,8 @@ export default async function Home() {
     const supabase = await createClient();
 
     // Fetch the webpage HTML using the built‑in fetch API.
-    const url = 'https://next-ecommerce-nine-omega.vercel.app/'
-    // const url = 'https://sales.ft.org.ua/events'
+    // const url = 'https://next-ecommerce-nine-omega.vercel.app/'
+    const url = 'https://sales.ft.org.ua/events'
     const response = await fetch(url);
     const html = await response.text();
 
@@ -16,8 +16,8 @@ export default async function Home() {
 
 
     // Update the selector to match your target <select> element.
-    const selector = '.grid .product-brand'
-    // const selector = '[data-select="month"] .customSelect__list button'
+    // const selector = '.grid .product-brand'
+    const selector = '[data-select="month"] .customSelect__list button'
     $(selector).each((_, el) => {
         const optionValue = $(el).text()?.trim();
         if (optionValue) {
@@ -98,7 +98,6 @@ export default async function Home() {
     }
 
     await updateOptionsIfNeeded(storedOptions, newOptions);
-
 
     return (
 
