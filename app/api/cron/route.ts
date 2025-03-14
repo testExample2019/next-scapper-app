@@ -20,10 +20,8 @@ export async function GET(request: Request) {
     // Load the HTML into Cheerio and extract new options
     const $ = cheerio.load(html);
     const newOptions: { id: number; name: string }[] = [];
-
     // const selector = '.grid .product-brand'
     const selector = '[data-select="month"] .customSelect__list button'
-
     $(selector).each((index, el) => {
         const optionValue = $(el).attr('data-select-option')?.trim();
         if (optionValue) {
