@@ -60,21 +60,21 @@ export async function GET(request: Request) {
             const {error} = await supabase
                 .from("options")
                 .delete()
-                .neq("id", 0);  // Deletes all rows by ensuring "id" is always different
+                .neq("id", [storedOptions.map(item => item.id)]);
             if (error) {
                 console.error("Error deleting rows:", error);
             } else {
                 console.log("All rows deleted successfully.");
             }
-
-            // Option does not exist, so insert it
-            const {error: insertError} = await supabase
+            const { error: upsertError } = await supabase
                 .from('options')
-                .insert(newOptions);
-            if (insertError) {
-                console.error("Error inserting data:", error);
+                .upsert(newOptions)
+                .select()
+
+            if (upsertError) {
+                console.error("Error deleting rows:", upsertError);
             } else {
-                console.log("Data inserted successfully!");
+                console.log("All rows updated successfully.");
             }
         }
     }
