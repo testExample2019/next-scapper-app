@@ -8,7 +8,6 @@ export async function GET(request: Request) {
     if (request.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
         return new NextResponse('Unauthorized', {status: 401});
     }
-
     const supabase = await createClient();
 
     // Fetch the webpage HTML to retrieve new options
@@ -82,10 +81,6 @@ export async function GET(request: Request) {
                 if (deleteError) console.error('Error deleting option:', deleteError);
             }
         }
-
-        await supabase.functions.invoke('telegramNotification', {
-            body: {name: 'Functions'},
-        })
     }
 
 
