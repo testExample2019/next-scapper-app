@@ -6,7 +6,7 @@ export default async function Home() {
 
     // Fetch the webpage HTML using the built‑in fetch API.
     // const url = 'https://next-ecommerce-nine-omega.vercel.app/'
-    const url = 'https://sales.ft.org.ua/events'
+    const url = 'https://sales.ft.org.ua/events';
     const response = await fetch(url);
     const html = await response.text();
 
@@ -17,7 +17,7 @@ export default async function Home() {
 
     // Update the selector to match your target <select> element.
     // const selector = '.grid .product-brand'
-    const selector = '[data-select="month"] .customSelect__list button'
+    const selector = '[data-select="month"] .customSelect__list button';
     $(selector).each((_, el) => {
         const optionValue = $(el).attr('data-select-option')?.trim();
         if (optionValue) {
@@ -59,14 +59,27 @@ export default async function Home() {
         newOptions: { id: number; name: string }[],
     ) {
         if (!compareOptions(storedOptions, newOptions)) {
+            // Remove options from storedOptions that are not present in newOptions
+            const newOptionIds = newOptions.map(option => option.id);
+            for (const storedOption of storedOptions) {
+                if (!newOptionIds.includes(storedOption.id)) {
+                    const {error: deleteError} = await supabase
+                        .from('options')
+                        .delete()
+                        .eq('id', storedOption.id);
+                    if (deleteError) {
+                        console.error('Error deleting option:', deleteError);
+                    }
+                }
+            }
             // Iterate over each new option and update the corresponding row in the table
             for (const option of newOptions) {
                 const existingOption = storedOptions.find(stored => stored.id === option.id);
                 if (existingOption) {
                     // Option exists, so update its name
-                    const { error: updateError } = await supabase
+                    const {error: updateError} = await supabase
                         .from('options')
-                        .update({ name: option.name })
+                        .update({name: option.name})
                         .eq('id', option.id);
                     if (updateError) {
                         console.error('Error updating option:', updateError);
@@ -81,19 +94,6 @@ export default async function Home() {
                     }
                 }
             }
-            // Remove options from storedOptions that are not present in newOptions
-            const newOptionIds = newOptions.map(option => option.id);
-            for (const storedOption of storedOptions) {
-                if (!newOptionIds.includes(storedOption.id)) {
-                    const {error: deleteError} = await supabase
-                        .from('options')
-                        .delete()
-                        .eq('id', storedOption.id);
-                    if (deleteError) {
-                        console.error('Error deleting option:', deleteError);
-                    }
-                }
-            }
         }
     }
 
@@ -105,26 +105,27 @@ export default async function Home() {
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
                 <div className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-2">
                     <div className="max-w-xl lg:max-w-lg">
-                        <h2 className="text-4xl font-semibold tracking-tight text-white">Subscribed to theater changes</h2>
+                        <h2 className="text-4xl font-semibold tracking-tight text-white">Subscribed to theater
+                            changes</h2>
 
-                            <div className="max-w-4xl mx-auto shadow-md rounded-lg p-6">
-                                <h2 className="text-2xl font-semibold text-gray-100 mb-4">Stored Options List</h2>
-                                {storedOptions.length > 0 ? (
-                                    <ul className="space-y-2">
-                                        {newOptions.map(option => (
-                                            <li
-                                                key={option.id}
-                                                className="flex items-center justify-between bg-gray-200 p-3 rounded-md shadow-sm"
-                                            >
-                                                <span className="text-gray-700">{option.name}</span>
-                                                <span className="text-gray-500 text-sm">ID: {option.id}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                ) : (
-                                    <p className="text-gray-500">No options found.</p>
-                                )}
-                            </div>
+                        <div className="max-w-4xl mx-auto shadow-md rounded-lg p-6">
+                            <h2 className="text-2xl font-semibold text-gray-100 mb-4">Stored Options List</h2>
+                            {storedOptions.length > 0 ? (
+                                <ul className="space-y-2">
+                                    {newOptions.map(option => (
+                                        <li
+                                            key={option.id}
+                                            className="flex items-center justify-between bg-gray-200 p-3 rounded-md shadow-sm"
+                                        >
+                                            <span className="text-gray-700">{option.name}</span>
+                                            <span className="text-gray-500 text-sm">ID: {option.id}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p className="text-gray-500">No options found.</p>
+                            )}
+                        </div>
 
                     </div>
 
