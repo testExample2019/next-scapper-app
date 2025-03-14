@@ -99,6 +99,9 @@ export default async function Home() {
 
     await updateOptionsIfNeeded(storedOptions, newOptions);
 
+    console.log(storedOptions);
+    console.log(newOptions);
+
     return (
 
         <div className="relative isolate h-screen overflow-hidden bg-gray-900 py-16 sm:py-24 lg:py-32">
