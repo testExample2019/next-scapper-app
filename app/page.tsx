@@ -81,6 +81,8 @@ export default async function Home() {
         }
     }
 
+    console.log(storedOptions)
+    console.log(newOptions)
     await updateOptionsIfNeeded(storedOptions, newOptions);
 
     return (
