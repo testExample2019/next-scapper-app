@@ -98,6 +98,9 @@ export default async function Home() {
             const botToken = process.env.TELEGRAM_BOT_TOKEN;
             const chatId = process.env.TELEGRAM_CHAT_ID;
 
+            console.log(botToken)
+            console.log(chatId)
+
             if (!botToken || !chatId) {
                 console.error('Telegram bot token or chat ID not configured.');
             } else {
