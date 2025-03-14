@@ -108,8 +108,8 @@ export default async function Home() {
                         <h2 className="text-4xl font-semibold tracking-tight text-white">Subscribed to theater changes</h2>
 
                             <div className="max-w-4xl mx-auto shadow-md rounded-lg p-6">
-                                <h2 className="text-2xl font-semibold text-gray-100 mb-4">New Options List</h2>
-                                {newOptions.length > 0 ? (
+                                <h2 className="text-2xl font-semibold text-gray-100 mb-4">Stored Options List</h2>
+                                {storedOptions.length > 0 ? (
                                     <ul className="space-y-2">
                                         {newOptions.map(option => (
                                             <li
