@@ -60,13 +60,13 @@ export default async function Home() {
     ) {
         if (!compareOptions(storedOptions, newOptions)) {
             // Remove options from storedOptions that are not present in newOptions
-            const newOptionIds = newOptions.map(option => option.id);
+            const newOptionIds = newOptions.map(option => option.name);
             for (const storedOption of storedOptions) {
-                if (!newOptionIds.includes(storedOption.id)) {
+                if (!newOptionIds.includes(storedOption.name)) {
                     const {error: deleteError} = await supabase
                         .from('options')
                         .delete()
-                        .eq('id', storedOption.id);
+                        .eq('name', storedOption.name);
                     if (deleteError) {
                         console.error('Error deleting option:', deleteError);
                     }
