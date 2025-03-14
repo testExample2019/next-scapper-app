@@ -22,7 +22,7 @@ export async function GET(request: Request) {
     const selector = '[data-select="month"] .customSelect__list button'
 
     $(selector).each((index, el) => {
-        const optionValue = $(el).text()?.trim();
+        const optionValue = $(el).attr('data-select-option')?.trim();
         if (optionValue) {
             newOptions.push({id: index, name: optionValue});
         }

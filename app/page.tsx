@@ -19,7 +19,7 @@ export default async function Home() {
     // const selector = '.grid .product-brand'
     const selector = '[data-select="month"] .customSelect__list button'
     $(selector).each((_, el) => {
-        const optionValue = $(el).text()?.trim();
+        const optionValue = $(el).attr('data-select-option')?.trim();
         if (optionValue) {
             newOptions.push({
                 id: _,
