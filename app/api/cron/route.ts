@@ -51,37 +51,35 @@ export async function GET(request: Request) {
         return true;
     }
 
-    // Update options in Supabase if there is a difference
-    if (!compareOptions(storedOptions, newOptions)) {
-        // Update existing options or insert new ones
-        for (const option of newOptions) {
-            const existing = storedOptions.find(o => o.id === option.id);
-            if (existing) {
-                const {error: updateError} = await supabase
-                    .from('options')
-                    .update({name: option.name})
-                    .eq('id', option.id);
-                if (updateError) console.error('Error updating option:', updateError);
+    // Function to update options in Supabase if they differ from newOptions
+    async function updateOptionsIfNeeded(
+        storedOptions: { id: number; name: string }[],
+        newOptions: { id: number; name: string }[],
+    ) {
+        if (!compareOptions(storedOptions, newOptions)) {
+            const {error} = await supabase
+                .from("options")
+                .delete()
+                .neq("id", 0);  // Deletes all rows by ensuring "id" is always different
+            if (error) {
+                console.error("Error deleting rows:", error);
             } else {
-                const {error: insertError} = await supabase
-                    .from('options')
-                    .insert(option);
-                if (insertError) console.error('Error inserting option:', insertError);
+                console.log("All rows deleted successfully.");
             }
-        }
 
-        // Remove options that are no longer present
-        const newIds = newOptions.map(o => o.id);
-        for (const stored of storedOptions) {
-            if (!newIds.includes(stored.id)) {
-                const {error: deleteError} = await supabase
-                    .from('options')
-                    .delete()
-                    .eq('id', stored.id);
-                if (deleteError) console.error('Error deleting option:', deleteError);
+            // Option does not exist, so insert it
+            const {error: insertError} = await supabase
+                .from('options')
+                .insert(newOptions);
+            if (insertError) {
+                console.error("Error inserting data:", error);
+            } else {
+                console.log("Data inserted successfully!");
             }
         }
     }
+
+    await updateOptionsIfNeeded(storedOptions, newOptions);
 
 
     return NextResponse.json({
