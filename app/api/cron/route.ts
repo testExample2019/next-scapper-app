@@ -80,9 +80,6 @@ export async function GET(request: Request) {
         }
     }
 
-    console.log(storedOptions)
-    console.log(newOptions)
-
     await updateOptionsIfNeeded(storedOptions, newOptions);
 
 
