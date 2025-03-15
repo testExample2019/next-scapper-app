@@ -24,9 +24,9 @@ export default async function Home() {
 
                         <div className="max-w-4xl mx-auto shadow-md rounded-lg p-6">
                             <h2 className="text-2xl font-semibold text-gray-100 mb-4">Stored Options List</h2>
-                            {storedOptions.length > 0 ? (
+                            {storedOptions?.length > 0 ? (
                                 <ul className="space-y-2">
-                                    {storedOptions.map(option => (
+                                    {storedOptions?.map(option => (
                                         <li
                                             key={option.id}
                                             className="flex items-center justify-between bg-gray-200 p-3 rounded-md shadow-sm"
